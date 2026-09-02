@@ -16,7 +16,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
-button,input{font:inherit}
+button,input,select{font:inherit}
 button{cursor:pointer}
 .navbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);height:68px}
 .nav-inner{max-width:1250px;height:100%;margin:auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
@@ -62,8 +62,6 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
 .worker-name{font-weight:800}.phone{color:var(--muted);font-size:13px}
 .badge{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}
 .badge.green{background:#eaf7ef;color:var(--success)}.badge.gray{background:#f0f1f2;color:#6b7280}
-.attendance{display:flex;align-items:center;gap:8px}
-.attendance input{width:20px;height:20px;accent-color:var(--success);cursor:pointer}
 .att-date{font-size:12px;color:var(--muted)}
 .actions{display:flex;gap:7px;flex-wrap:wrap}
 .empty{text-align:center;padding:50px;color:var(--muted)}
@@ -109,7 +107,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
     <div class="hero">
       <div>
         <h1>Quản lý công thợ .</h1>
-        <p>Mọi thay đổi về danh sách thợ, ngày làm việc hay số tiền đều được hệ thống tự động lưu trữ trực tuyến qua .</p>
+        <p>Mọi thay đổi về danh sách thợ, ngày làm việc hay số tiền đều được hệ thống tự động lưu trữ trực tuyến qua đám mây.</p>
         <div class="hero-actions">
           <button class="btn btn-primary" onclick="goPage('manage')">📝 Xem Quản Lí Thợ</button>
           <button class="btn btn-outline" style="background:#fff; color:#000" onclick="goPage('add')">+ Thêm Thợ Mới</button>
@@ -159,7 +157,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
   <!-- QUẢN LÍ -->
   <section id="manage" class="page">
     <div class="section-title">
-      <div><h2>Quản Lí Thợ</h2><p>Tick ✓ vào ô ngày tương ứng nếu thợ có đi làm. Tự động đồng bộ thời gian thực.</p></div>
+      <div><h2>Quản Lí Thợ</h2><p>Chọn ca làm việc cho từng ngày (Nghỉ, Sáng, Tối, Cả ngày). Tự động đồng bộ thời gian thực.</p></div>
       <button class="btn btn-dark" onclick="goPage('add')">+ Thêm thợ</button>
     </div>
     <div class="toolbar">
@@ -169,7 +167,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
       </div>
       <input class="search" id="search" placeholder="Tìm theo họ tên hoặc số điện thoại...">
     </div>
-    <div class="notice">Bảng tự động tạo các cột từ ngày người thợ đầu tiên bắt đầu làm việc đến ngày hiện tại. Ô trống gạch ngang là trước khi người thợ đó bắt đầu làm, ô đánh dấu (tick) là ngày đi làm. </div>
+    <div class="notice">Quy đổi công: Sáng = 0.5 công, Tối = 0.5 công, Cả ngày = 1 công. Ô trống gạch ngang là trước khi người thợ đó bắt đầu làm việc.</div>
 
     <div class="table-wrap">
       <table>
@@ -182,11 +180,11 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
   <!-- TỔNG TIỀN VÀ IN HÓA ĐƠN -->
   <section id="salary" class="page">
     <div class="section-title">
-      <div><h2>Tổng Kết Tiền Công & In Hóa Đơn</h2><p>Hệ thống tự động tính tổng tiền dựa vào số ngày đã chấm công.</p></div>
+      <div><h2>Tổng Kết Tiền Công & In Hóa Đơn</h2><p>Hệ thống tự động tính tổng tiền dựa vào số ngày công thực tế.</p></div>
     </div>
     <div class="toolbar">
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <label style="font-weight:700; color:var(--primary);">Nhập số tiền 1 buổi (VNĐ):</label>
+        <label style="font-weight:700; color:var(--primary);">Nhập số tiền 1 ngày công (VNĐ):</label>
         <input type="number" id="dailyWage" class="search" style="min-width:180px; text-align:right; border-color:var(--success); color:var(--success); font-weight:bold;" placeholder="VD: 300000">
       </div>
       <div class="att-date" style="color:var(--success); font-weight:bold;">Mức tiền được đồng bộ trực tuyến.</div>
@@ -199,7 +197,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
             <th>#</th>
             <th>Họ và tên thợ</th>
             <th>Số điện thoại</th>
-            <th style="text-align:center;">Số ngày làm (công)</th>
+            <th style="text-align:center;">Tổng số công</th>
             <th style="text-align:right;">Thành tiền (VNĐ)</th>
             <th style="text-align:center;">Thao tác</th>
           </tr>
@@ -212,7 +210,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
 
 <footer class="footer">
   <div class="footer-inner">
-    <div><strong>SỔ CÔNG THỢ</strong><br><small>Hệ thống chấm công được phát triển và tạo bởi Nguyễn Lâm Huy.</small></div>
+    <div><strong>SỔ CÔNG THỢ</strong><br><small>Hệ thống chấm công đám mây.</small></div>
     <div><strong>Liên hệ</strong><br><small>Điện thoại: 0932 226 567</small></div>
     <div><strong>Thông tin</strong><br><small>Quản lý thợ • Chấm công • Tính lương</small></div>
   </div>
@@ -252,8 +250,8 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
     <thead>
       <tr style="background:#f4f5f7;">
         <th style="padding:10px; text-align:left;">Diễn giải công việc</th>
-        <th style="padding:10px; text-align:center;">Số lượng (Ngày công)</th>
-        <th style="padding:10px; text-align:right;">Đơn giá 1 buổi (VNĐ)</th>
+        <th style="padding:10px; text-align:center;">Tổng số công</th>
+        <th style="padding:10px; text-align:right;">Đơn giá 1 ngày (VNĐ)</th>
         <th style="padding:10px; text-align:right;">Thành tiền (VNĐ)</th>
       </tr>
     </thead>
@@ -286,7 +284,6 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
 </div>
 
 <script>
-// Cấu hình Firebase[span_0](start_span)[span_0](end_span)
 const firebaseConfig = {
   apiKey: "AIzaSyCMtbqgiEwWfb8SCmBLJv55xfb_1NKFJ28",
   authDomain: "danhcongtho.firebaseapp.com",
@@ -297,14 +294,12 @@ const firebaseConfig = {
   measurementId: "G-YN86P0SH1X"
 };
 
-// Khởi tạo Firebase[span_1](start_span)[span_1](end_span)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let workers = [];
 let editingId = null;
 
-// Lắng nghe dữ liệu thợ từ Firebase Realtime Database theo thời gian thực
 db.ref("workers").on("value", (snapshot) => {
   const data = snapshot.val();
   if (data) {
@@ -315,7 +310,6 @@ db.ref("workers").on("value", (snapshot) => {
   refreshUI();
 });
 
-// Lắng nghe mức tiền công chung từ Firebase
 db.ref("wage").on("value", (snapshot) => {
   const val = snapshot.val();
   if (val !== null) {
@@ -444,12 +438,15 @@ function renderWorkers(){
         if (d < w.startDate) {
            return `<td style="text-align:center; background:#fafafa;"><span style="color:#ccc;font-size:14px;font-weight:bold;">-</span></td>`;
         }
-        const worked = Boolean(w.attendance && w.attendance[d]);
+        const val = w.attendance && w.attendance[d] ? w.attendance[d] : "";
         return `
           <td style="text-align:center">
-            <input type="checkbox" style="width:20px;height:20px;accent-color:var(--success);cursor:pointer;"
-                   ${worked ? "checked" : ""} 
-                   onchange="toggleAttendance('${w.id}', '${d}', this.checked)">
+            <select onchange="updateAttendance('${w.id}', '${d}', this.value)" style="padding:4px 6px; border-radius:6px; border:1px solid var(--border); font-size:12px; background:#fff; cursor:pointer;">
+              <option value="" ${val===""?"selected":""}>Nghỉ</option>
+              <option value="sang" ${val==="sang"?"selected":""}>Sáng</option>
+              <option value="toi" ${val==="toi"?"selected":""}>Tối</option>
+              <option value="cangay" ${val==="cangay"||val===true?"selected":""}>Cả ngày</option>
+            </select>
           </td>
         `;
       }).join('')}
@@ -468,6 +465,16 @@ function renderWorkers(){
   }, 10);
 }
 
+function calculateTotalDays(attendance) {
+  if (!attendance) return 0;
+  let total = 0;
+  Object.values(attendance).forEach(v => {
+    if (v === "cangay" || v === true) total += 1;
+    else if (v === "sang" || v === "toi") total += 0.5;
+  });
+  return total;
+}
+
 function renderSalary() {
   const tbody = document.getElementById("salaryTable");
   const wage = parseInt(document.getElementById("dailyWage").value) || 0;
@@ -478,7 +485,7 @@ function renderSalary() {
   }
 
   tbody.innerHTML = workers.map((w, i) => {
-    const totalDays = w.attendance ? Object.values(w.attendance).filter(val => val === true).length : 0;
+    const totalDays = calculateTotalDays(w.attendance);
     const totalMoney = totalDays * wage;
     
     return `<tr>
@@ -512,9 +519,13 @@ function printInvoice(id, days, rate, total) {
   window.print();
 }
 
-function toggleAttendance(id, dateKey, checked){
-  db.ref(`workers/${id}/attendance/${dateKey}`).set(checked);
-  toast(checked ? `Đã ghi nhận thành công !` : `Đã hủy thành công !`);
+function updateAttendance(id, dateKey, val){
+  if(val === "") {
+    db.ref(`workers/${id}/attendance/${dateKey}`).remove();
+  } else {
+    db.ref(`workers/${id}/attendance/${dateKey}`).set(val);
+  }
+  toast("Đã cập nhật ca làm việc trực tuyến.");
 }
 
 document.getElementById("addForm").addEventListener("submit",e=>{
@@ -534,7 +545,7 @@ document.getElementById("addForm").addEventListener("submit",e=>{
   });
 
   e.target.reset();
-  toast("Đã thêm thợ thành công lên.");
+  toast("Đã thêm thợ thành công lên đám mây.");
   goPage("manage");
 });
 
