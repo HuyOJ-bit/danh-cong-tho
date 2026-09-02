@@ -514,7 +514,7 @@ function printInvoice(id, days, rate, total) {
 
 function toggleAttendance(id, dateKey, checked){
   db.ref(`workers/${id}/attendance/${dateKey}`).set(checked);
-  toast(checked ? `Đã ghi nhận đi làm trực tuyến.` : `Đã hủy chấm công.`);
+  toast(checked ? `Đã ghi nhận thành công !` : `Đã hủy thành công !`);
 }
 
 document.getElementById("addForm").addEventListener("submit",e=>{
@@ -534,7 +534,7 @@ document.getElementById("addForm").addEventListener("submit",e=>{
   });
 
   e.target.reset();
-  toast("Đã thêm thợ thành công lên đám mây.");
+  toast("Đã thêm thợ thành công lên.");
   goPage("manage");
 });
 
