@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Đánh Công Thợ</title>
+<!-- Thư viện Firebase Compat -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
 :root{
   --bg:#f4f5f7;--surface:#fff;--text:#17202a;--muted:#6b7280;
@@ -106,7 +109,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
     <div class="hero">
       <div>
         <h1>Quản lý công thợ .</h1>
-        <p>Mọi thay đổi về danh sách thợ, ngày làm việc hay số tiền đều được hệ thống tự động lưu trữ ngầm ngay lập tức.</p>
+        <p>Mọi thay đổi về danh sách thợ, ngày làm việc hay số tiền đều được hệ thống tự động lưu trữ trực tuyến qua đám mây.</p>
         <div class="hero-actions">
           <button class="btn btn-primary" onclick="goPage('manage')">📝 Xem Quản Lí Thợ</button>
           <button class="btn btn-outline" style="background:#fff; color:#000" onclick="goPage('add')">+ Thêm Thợ Mới</button>
@@ -156,7 +159,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
   <!-- QUẢN LÍ -->
   <section id="manage" class="page">
     <div class="section-title">
-      <div><h2>Quản Lí Thợ</h2><p>Tick ✓ vào ô ngày tương ứng nếu thợ có đi làm. Tự động lưu 100%.</p></div>
+      <div><h2>Quản Lí Thợ</h2><p>Tick ✓ vào ô ngày tương ứng nếu thợ có đi làm. Tự động đồng bộ thời gian thực.</p></div>
       <button class="btn btn-dark" onclick="goPage('add')">+ Thêm thợ</button>
     </div>
     <div class="toolbar">
@@ -186,7 +189,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
         <label style="font-weight:700; color:var(--primary);">Nhập số tiền 1 buổi (VNĐ):</label>
         <input type="number" id="dailyWage" class="search" style="min-width:180px; text-align:right; border-color:var(--success); color:var(--success); font-weight:bold;" placeholder="VD: 300000">
       </div>
-      <div class="att-date" style="color:var(--success); font-weight:bold;">Mức tiền được tự động lưu lại.</div>
+      <div class="att-date" style="color:var(--success); font-weight:bold;">Mức tiền được đồng bộ trực tuyến.</div>
     </div>
     
     <div class="table-wrap">
@@ -209,7 +212,7 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
 
 <footer class="footer">
   <div class="footer-inner">
-    <div><strong>SỔ CÔNG THỢ</strong><br><small>Hệ thống chấm công.</small></div>
+    <div><strong>SỔ CÔNG THỢ</strong><br><small>Hệ thống chấm công đám mây.</small></div>
     <div><strong>Liên hệ</strong><br><small>Điện thoại: 0932 226 567</small></div>
     <div><strong>Thông tin</strong><br><small>Quản lý thợ • Chấm công • Tính lương</small></div>
   </div>
@@ -283,18 +286,51 @@ th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
 </div>
 
 <script>
-const STORAGE_KEY = "so_cong_tho_v1";
-const WAGE_KEY = "so_cong_tho_wage";
-let workers = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+// Cấu hình Firebase[span_0](start_span)[span_0](end_span)
+const firebaseConfig = {
+  apiKey: "AIzaSyCMtbqgiEwWfb8SCmBLJv55xfb_1NKFJ28",
+  authDomain: "danhcongtho.firebaseapp.com",
+  projectId: "danhcongtho",
+  storageBucket: "danhcongtho.firebasestorage.app",
+  messagingSenderId: "462024456035",
+  appId: "1:462024456035:web:ecd3206d1345445e0b4556",
+  measurementId: "G-YN86P0SH1X"
+};
+
+// Khởi tạo Firebase[span_1](start_span)[span_1](end_span)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let workers = [];
 let editingId = null;
 
-let savedWage = localStorage.getItem(WAGE_KEY);
-if(savedWage) document.getElementById("dailyWage").value = savedWage;
-else document.getElementById("dailyWage").value = "300000";
+// Lắng nghe dữ liệu thợ từ Firebase Realtime Database theo thời gian thực
+db.ref("workers").on("value", (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    workers = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+  } else {
+    workers = [];
+  }
+  refreshUI();
+});
+
+// Lắng nghe mức tiền công chung từ Firebase
+db.ref("wage").on("value", (snapshot) => {
+  const val = snapshot.val();
+  if (val !== null) {
+    document.getElementById("dailyWage").value = val;
+  } else {
+    document.getElementById("dailyWage").value = "300000";
+  }
+  if(document.getElementById("salary").classList.contains("active")) {
+    renderSalary();
+  }
+});
 
 document.getElementById("dailyWage").addEventListener("input", (e) => {
-  localStorage.setItem(WAGE_KEY, e.target.value);
-  renderSalary();
+  const val = parseInt(e.target.value) || 0;
+  db.ref("wage").set(val);
 });
 
 function formatMoney(amount) {
@@ -336,10 +372,6 @@ function formatDate(value){
   return `${d}/${m}/${y}`;
 }
 
-function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(workers));
-}
-
 function toast(msg){
   const el=document.getElementById("toast");
   el.textContent=msg; el.classList.add("show");
@@ -359,6 +391,12 @@ function goPage(page){
 document.querySelectorAll(".nav-links button").forEach(btn=>{
   btn.addEventListener("click",()=>goPage(btn.dataset.page));
 });
+
+function refreshUI() {
+  renderHome();
+  if(document.getElementById("manage").classList.contains("active")) renderWorkers();
+  if(document.getElementById("salary").classList.contains("active")) renderSalary();
+}
 
 function renderHome(){
   document.getElementById("workerCount").textContent=workers.length;
@@ -475,30 +513,28 @@ function printInvoice(id, days, rate, total) {
 }
 
 function toggleAttendance(id, dateKey, checked){
-  const w=workers.find(x=>x.id===id);
-  if(!w)return;
-  if(!w.attendance)w.attendance={};
-  w.attendance[dateKey]=checked;
-  save(); 
-  toast(checked ? `Đã ghi nhận đi làm.` : `Đã hủy chấm công.`);
-  if(document.getElementById("salary").classList.contains("active")) {
-      renderSalary();
-  }
+  db.ref(`workers/${id}/attendance/${dateKey}`).set(checked);
+  toast(checked ? `Đã ghi nhận đi làm trực tuyến.` : `Đã hủy chấm công.`);
 }
 
 document.getElementById("addForm").addEventListener("submit",e=>{
   e.preventDefault();
-  const worker={
-    id:crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-    name:document.getElementById("name").value.trim(),
-    phone:document.getElementById("phone").value.trim(),
-    startDate:document.getElementById("startDate").value,
-    attendance:{}
-  };
-  if(!worker.name||!worker.phone||!worker.startDate)return;
-  workers.push(worker); save();
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const startDate = document.getElementById("startDate").value;
+  
+  if(!name || !phone || !startDate) return;
+
+  const newRef = db.ref("workers").push();
+  newRef.set({
+    name: name,
+    phone: phone,
+    startDate: startDate,
+    attendance: {}
+  });
+
   e.target.reset();
-  toast("Đã thêm thợ thành công.");
+  toast("Đã thêm thợ thành công lên đám mây.");
   goPage("manage");
 });
 
@@ -510,35 +546,46 @@ function editWorker(id){
   document.getElementById("editStart").value=w.startDate;
   document.getElementById("editModal").classList.add("show");
 }
+
 function closeEdit(){
   editingId=null;document.getElementById("editModal").classList.remove("show");
 }
+
 function saveEdit(){
-  const w=workers.find(x=>x.id===editingId); if(!w)return;
-  w.name=document.getElementById("editName").value.trim();
-  w.phone=document.getElementById("editPhone").value.trim();
-  w.startDate=document.getElementById("editStart").value;
-  if(!w.name||!w.phone||!w.startDate){toast("Vui lòng nhập đầy đủ thông tin.");return}
-  save();
-  closeEdit();renderWorkers();toast("Đã cập nhật thông tin.");
+  const name = document.getElementById("editName").value.trim();
+  const phone = document.getElementById("editPhone").value.trim();
+  const startDate = document.getElementById("editStart").value;
+
+  if(!name || !phone || !startDate){
+    toast("Vui lòng nhập đầy đủ thông tin.");
+    return;
+  }
+
+  db.ref(`workers/${editingId}`).update({
+    name: name,
+    phone: phone,
+    startDate: startDate
+  });
+
+  closeEdit();
+  toast("Đã cập nhật thông tin.");
 }
+
 function deleteWorker(id){
   const w=workers.find(x=>x.id===id); if(!w)return;
-  if(!confirm(`Bạn có chắc muốn xóa thợ "${w.name}"?`))return;
-  workers=workers.filter(x=>x.id!==id);
-  save();
-  renderWorkers();
-  if(document.getElementById("salary").classList.contains("active")) renderSalary();
+  if(!confirm(`Bạn có chắc muốn xóa thợ "${w.name}" khỏi hệ thống chung?`))return;
+  
+  db.ref(`workers/${id}`).remove();
   toast("Đã xóa thợ.");
 }
-document.getElementById("search").addEventListener("input",renderWorkers);
+
+document.getElementById("search").addEventListener("input", renderWorkers);
 
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
+
 document.getElementById("startDate").value=todayKey();
-renderHome();
-renderWorkers();
 
 let lastDate=todayKey();
 setInterval(()=>{
