@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đánh Công Thợ</title>
+<style>
+:root{
+  --bg:#f4f5f7;--surface:#fff;--text:#17202a;--muted:#6b7280;
+  --primary:#263238;--primary2:#37474f;--border:#e5e7eb;
+  --success:#16834a;--danger:#c62828;--warning:#b26a00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+button,input{font:inherit}
+button{cursor:pointer}
+.navbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);height:68px}
+.nav-inner{max-width:1250px;height:100%;margin:auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;color:var(--primary);font-size:20px}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:900}
+.nav-links{display:flex;gap:5px; overflow-x: auto; scrollbar-width: none;}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links button{border:0;background:transparent;color:#4b5563;padding:10px 14px;border-radius:8px;font-weight:600;white-space:nowrap}
+.nav-links button:hover,.nav-links button.active{background:#eef0f2;color:var(--primary)}
+main{max-width:1250px;margin:auto;padding:30px 22px 50px}
+.page{display:none}.page.active{display:block}
+.hero{background:var(--primary);color:#fff;border-radius:18px;padding:42px;display:grid;grid-template-columns:1.5fr .8fr;gap:30px;align-items:center}
+.hero h1{font-size:clamp(28px,4vw,46px);line-height:1.12;margin-bottom:13px}
+.hero p{color:#dce2e5;max-width:700px}
+.hero-actions{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:0;border-radius:9px;padding:11px 17px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:#fff;color:var(--primary)}
+.btn-dark{background:var(--primary);color:#fff}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text); background-color:#fff;}
+.btn-danger{background:#fff0f0;color:var(--danger);border:1px solid #ffd2d2}
+.btn-success{background:#eaf7ef;color:var(--success);border:1px solid #c9ecd7}
+.btn:hover{filter:brightness(.97);transform:translateY(-1px)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.13);border-radius:14px;padding:22px}
+.stat strong{display:block;font-size:34px}.stat span{color:#dce2e5}
+.section-title{margin:32px 0 16px;display:flex;align-items:end;justify-content:space-between;gap:15px; flex-wrap:wrap;}
+.section-title h2{font-size:24px}.section-title p{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px}
+.card h3{margin-bottom:8px}.card p{color:var(--muted)}
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-card{max-width:720px;margin:auto;background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px}
+.form-group{margin-bottom:17px}.form-group label{display:block;font-weight:700;margin-bottom:7px}
+.form-group input{width:100%;padding:12px 13px;border:1px solid #d7dce0;border-radius:9px;outline:none}
+.form-group input:focus{border-color:#7b8790;box-shadow:0 0 0 3px #eceff1}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.toolbar{background:#fff;border:1px solid var(--border);padding:16px;border-radius:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.search{padding:10px 12px;border:1px solid var(--border);border-radius:9px;min-width:260px;outline:none}
+.table-wrap{margin-top:15px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+th{background:#f8f9fa;font-size:13px;color:#4b5563;white-space:nowrap}
+.worker-name{font-weight:800}.phone{color:var(--muted);font-size:13px}
+.badge{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}
+.badge.green{background:#eaf7ef;color:var(--success)}.badge.gray{background:#f0f1f2;color:#6b7280}
+.attendance{display:flex;align-items:center;gap:8px}
+.attendance input{width:20px;height:20px;accent-color:var(--success);cursor:pointer}
+.att-date{font-size:12px;color:var(--muted)}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.empty{text-align:center;padding:50px;color:var(--muted)}
+.notice{background:#f7f8f9;border-left:4px solid var(--primary);padding:13px 15px;border-radius:8px;margin-top:15px;color:#4b5563}
+.footer{background:#1e272c;color:#dbe1e4;margin-top:40px}
+.footer-inner{max-width:1250px;margin:auto;padding:30px 22px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer strong{color:#fff}.footer small{color:#9eaaaf}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal.show{display:flex}.modal-box{background:#fff;border-radius:15px;width:min(520px,100%);padding:24px}
+.modal-box h3{margin-bottom:18px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.toast{position:fixed;right:20px;bottom:20px;background:#263238;color:#fff;padding:13px 17px;border-radius:10px;box-shadow:0 10px 30px #0002;transform:translateY(120px);opacity:0;transition:.25s;z-index:200}
+.toast.show{transform:none;opacity:1}
+@media(max-width:800px){
+ .nav-inner{padding:0 12px;}.brand span{display:none}.nav-links button{padding:9px 8px;font-size:13px}
+ main{padding:18px 12px}.hero{grid-template-columns:1fr;padding:28px}.cards,.contact{grid-template-columns:1fr}
+ .search{min-width:100%;width:100%}.toolbar{align-items:stretch}
+}
+@media print {
+  body > *:not(#invoice) { display: none !important; }
+  #invoice { display: block !important; position: static; margin: 0; padding: 0; width: 100%; color: #000; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 15mm; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="brand"><div class="logo">📱</div><span>SỔ CÔNG THỢ</span></div>
+    <div class="nav-links">
+      <button data-page="home" class="active">Trang Chủ</button>
+      <button data-page="add">Thêm Thợ</button>
+      <button data-page="manage">Quản Lí Thợ</button>
+      <button data-page="salary" style="color:var(--success)">Tổng Tiền</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- TRANG CHỦ -->
+  <section id="home" class="page active">
+    <div class="hero">
+      <div>
+        <h1>Quản lý công thợ .</h1>
+        <p>Mọi thay đổi về danh sách thợ, ngày làm việc hay số tiền đều được hệ thống tự động lưu trữ ngầm ngay lập tức.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="goPage('manage')">📝 Xem Quản Lí Thợ</button>
+          <button class="btn btn-outline" style="background:#fff; color:#000" onclick="goPage('add')">+ Thêm Thợ Mới</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="workerCount">0</strong><span>Số thợ</span></div>
+        <div class="stat"><strong id="todayText">--</strong><span>Hôm nay</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <div><h2>Giới thiệu công việc Kĩ Sư Cơ Khí</h2><p>Công việc kỹ thuật đòi hỏi tính chính xác và an toàn.</p></div>
+    </div>
+    <div class="cards">
+      <div class="card"><h3>Thiết kế & chế tạo</h3><p>Thiết kế, gia công và lắp ráp các chi tiết, máy móc và hệ thống cơ khí.</p></div>
+      <div class="card"><h3>Vận hành & bảo trì</h3><p>Kiểm tra, vận hành, bảo dưỡng và xử lý các vấn đề kỹ thuật của thiết bị.</p></div>
+      <div class="card"><h3>An toàn & chất lượng</h3><p>Tuân thủ quy trình an toàn lao động, kiểm soát chất lượng và tiến độ công việc.</p></div>
+    </div>
+  </section>
+
+  <!-- THÊM THỢ -->
+  <section id="add" class="page">
+    <div class="section-title">
+      <div><h2>Thêm Thợ</h2><p>Nhập thông tin người thợ mới.</p></div>
+    </div>
+    <form class="form-card" id="addForm">
+      <div class="form-group">
+        <label for="name">Họ và tên *</label>
+        <input id="name" required maxlength="80" placeholder="Ví dụ: Nguyễn Văn A">
+      </div>
+      <div class="form-group">
+        <label for="phone">Số Điện Thoại *</label>
+        <input id="phone" required maxlength="20" inputmode="tel" placeholder="Ví dụ: 09xxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label for="startDate">Ngày đầu làm việc *</label>
+        <input id="startDate" type="date" required>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="goPage('home')">Hủy</button>
+        <button type="submit" class="btn btn-dark">Thêm thợ</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- QUẢN LÍ -->
+  <section id="manage" class="page">
+    <div class="section-title">
+      <div><h2>Quản Lí Thợ</h2><p>Tick ✓ vào ô ngày tương ứng nếu thợ có đi làm. Tự động lưu 100%.</p></div>
+      <button class="btn btn-dark" onclick="goPage('add')">+ Thêm thợ</button>
+    </div>
+    <div class="toolbar">
+      <div>
+        <strong id="manageCount">0 thợ</strong>
+        <div class="att-date">Ngày hiện tại: <span id="currentDateLabel"></span></div>
+      </div>
+      <input class="search" id="search" placeholder="Tìm theo họ tên hoặc số điện thoại...">
+    </div>
+    <div class="notice">Bảng tự động tạo các cột từ ngày người thợ đầu tiên bắt đầu làm việc đến ngày hiện tại. Ô trống gạch ngang là trước khi người thợ đó bắt đầu làm, ô đánh dấu (tick) là ngày đi làm. </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead id="workerHead"></thead>
+        <tbody id="workerTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TỔNG TIỀN VÀ IN HÓA ĐƠN -->
+  <section id="salary" class="page">
+    <div class="section-title">
+      <div><h2>Tổng Kết Tiền Công & In Hóa Đơn</h2><p>Hệ thống tự động tính tổng tiền dựa vào số ngày đã chấm công.</p></div>
+    </div>
+    <div class="toolbar">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <label style="font-weight:700; color:var(--primary);">Nhập số tiền 1 buổi (VNĐ):</label>
+        <input type="number" id="dailyWage" class="search" style="min-width:180px; text-align:right; border-color:var(--success); color:var(--success); font-weight:bold;" placeholder="VD: 300000">
+      </div>
+      <div class="att-date" style="color:var(--success); font-weight:bold;">Mức tiền được tự động lưu lại.</div>
+    </div>
+    
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Họ và tên thợ</th>
+            <th>Số điện thoại</th>
+            <th style="text-align:center;">Số ngày làm (công)</th>
+            <th style="text-align:right;">Thành tiền (VNĐ)</th>
+            <th style="text-align:center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="salaryTable"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><strong>SỔ CÔNG THỢ</strong><br><small>Hệ thống chấm công.</small></div>
+    <div><strong>Liên hệ</strong><br><small>Điện thoại: 0932 226 567</small></div>
+    <div><strong>Thông tin</strong><br><small>Quản lý thợ • Chấm công • Tính lương</small></div>
+  </div>
+</footer>
+
+<!-- MODAL SỬA -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <h3>Chỉnh sửa thông tin thợ</h3>
+    <div class="form-group"><label>Họ và tên</label><input id="editName"></div>
+    <div class="form-group"><label>Số điện thoại</label><input id="editPhone"></div>
+    <div class="form-group"><label>Ngày đầu làm</label><input id="editStart" type="date"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeEdit()">Hủy</button>
+      <button class="btn btn-dark" onclick="saveEdit()">Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- KHU VỰC IN HÓA ĐƠN -->
+<div id="invoice" style="display:none; font-family: 'Times New Roman', serif; max-width:800px; margin:auto;">
+  <div style="text-align:center; margin-bottom: 30px;">
+    <h1 style="margin:0; font-size:26px; text-transform:uppercase;">Hóa Đơn Thanh Toán Tiền Công</h1>
+    <p style="margin:5px 0 0; font-style:italic; color:#555;">Kèm theo dữ liệu Sổ Công Thợ</p>
+  </div>
+  
+  <div style="margin-bottom: 25px; font-size:16px; line-height:1.6;">
+    <p><strong>Ngày lập phiếu:</strong> <span id="invDate"></span></p>
+    <p><strong>Đơn vị chi trả:</strong> Sổ Công Thợ - ĐT: 0932 226 567</p>
+    <p><strong>Họ và tên người nhận:</strong> <span id="invName" style="text-transform:uppercase; font-weight:bold;"></span></p>
+    <p><strong>Số điện thoại liên hệ:</strong> <span id="invPhone"></span></p>
+  </div>
+  
+  <table style="width:100%; border-collapse:collapse; margin-bottom: 20px; font-size:16px;" border="1">
+    <thead>
+      <tr style="background:#f4f5f7;">
+        <th style="padding:10px; text-align:left;">Diễn giải công việc</th>
+        <th style="padding:10px; text-align:center;">Số lượng (Ngày công)</th>
+        <th style="padding:10px; text-align:right;">Đơn giá 1 buổi (VNĐ)</th>
+        <th style="padding:10px; text-align:right;">Thành tiền (VNĐ)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:12px;">Thanh toán tiền công đi làm</td>
+        <td style="padding:12px; text-align:center; font-weight:bold;" id="invDays"></td>
+        <td style="padding:12px; text-align:right;" id="invRate"></td>
+        <td style="padding:12px; text-align:right; font-weight:bold;" id="invTotalRow"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div style="text-align:right; font-size:18px; margin-bottom:40px;">
+    <p><strong>Tổng cộng thanh toán: <span id="invTotal" style="font-size:22px;"></span> VNĐ</strong></p>
+  </div>
+  
+  <div style="display:flex; justify-content:space-around; text-align:center; font-size:16px;">
+    <div>
+      <p style="font-weight:bold; margin-bottom:5px;">Người nhận tiền</p>
+      <p style="font-style:italic; font-size:14px;">(Ký, ghi rõ họ tên)</p>
+      <div style="height:80px;"></div>
+      <p><span id="invSignName" style="font-weight:bold;"></span></p>
+    </div>
+    <div>
+      <p style="font-weight:bold; margin-bottom:5px;">Người trả tiền</p>
+      <p style="font-style:italic; font-size:14px;">(Ký, đóng dấu nếu có)</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "so_cong_tho_v1";
+const WAGE_KEY = "so_cong_tho_wage";
+let workers = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let editingId = null;
+
+let savedWage = localStorage.getItem(WAGE_KEY);
+if(savedWage) document.getElementById("dailyWage").value = savedWage;
+else document.getElementById("dailyWage").value = "300000";
+
+document.getElementById("dailyWage").addEventListener("input", (e) => {
+  localStorage.setItem(WAGE_KEY, e.target.value);
+  renderSalary();
+});
+
+function formatMoney(amount) {
+  return new Intl.NumberFormat('vi-VN').format(amount);
+}
+
+function pad(n){return String(n).padStart(2,"0")}
+function todayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function getDisplayDates() {
+  const todayStr = todayKey();
+  if (!workers || workers.length === 0) return [todayStr];
+  
+  let minDateStr = workers[0].startDate;
+  for (let i = 1; i < workers.length; i++) {
+    if (workers[i].startDate < minDateStr) minDateStr = workers[i].startDate;
+  }
+  if (minDateStr > todayStr) minDateStr = todayStr;
+
+  const dates = [];
+  const current = new Date(minDateStr);
+  current.setHours(12, 0, 0, 0);
+  const end = new Date(todayStr);
+  end.setHours(12, 0, 0, 0);
+
+  while (current <= end) {
+    dates.push(`${current.getFullYear()}-${pad(current.getMonth()+1)}-${pad(current.getDate())}`);
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+}
+
+function formatDate(value){
+  if(!value) return "";
+  const [y,m,d]=value.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(workers));
+}
+
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+function goPage(page){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById(page).classList.add("active");
+  document.querySelectorAll(".nav-links button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(page==="manage") renderWorkers();
+  if(page==="salary") renderSalary();
+}
+
+document.querySelectorAll(".nav-links button").forEach(btn=>{
+  btn.addEventListener("click",()=>goPage(btn.dataset.page));
+});
+
+function renderHome(){
+  document.getElementById("workerCount").textContent=workers.length;
+  document.getElementById("manageCount").textContent=workers.length+" thợ";
+  const d=new Date();
+  document.getElementById("todayText").textContent=pad(d.getDate())+"/"+pad(d.getMonth()+1);
+  document.getElementById("currentDateLabel").textContent=formatDate(todayKey());
+}
+
+function renderWorkers(){
+  renderHome();
+  const q=(document.getElementById("search").value||"").toLowerCase().trim();
+  const filtered=workers.filter(w=>w.name.toLowerCase().includes(q)||w.phone.toLowerCase().includes(q));
+  const thead=document.getElementById("workerHead");
+  const tbody=document.getElementById("workerTable");
+  const displayDates = getDisplayDates();
+
+  thead.innerHTML = `
+    <tr>
+      <th>#</th>
+      <th style="min-width: 140px;">Họ và tên</th>
+      <th>Số điện thoại</th>
+      <th>Ngày bắt đầu</th>
+      ${displayDates.map(d => {
+        const [y, m, day] = d.split('-');
+        const isToday = (d === todayKey());
+        return `<th style="text-align:center; ${isToday ? 'color:var(--success); font-weight:800; background:#eaf7ef;' : ''}">${day}/${m}</th>`;
+      }).join('')}
+      <th style="min-width: 150px;">Thao tác</th>
+    </tr>
+  `;
+
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="${5 + displayDates.length}" class="empty">${workers.length ? "Không tìm thấy thợ phù hợp." : "Chưa có thợ nào. Hãy bấm “Thêm thợ” để bắt đầu."}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML=filtered.map((w,i)=>{
+    return `<tr>
+      <td>${i+1}</td>
+      <td><div class="worker-name">${escapeHtml(w.name)}</div></td>
+      <td><span class="phone">${escapeHtml(w.phone)}</span></td>
+      <td>${formatDate(w.startDate)}</td>
+      ${displayDates.map(d => {
+        if (d < w.startDate) {
+           return `<td style="text-align:center; background:#fafafa;"><span style="color:#ccc;font-size:14px;font-weight:bold;">-</span></td>`;
+        }
+        const worked = Boolean(w.attendance && w.attendance[d]);
+        return `
+          <td style="text-align:center">
+            <input type="checkbox" style="width:20px;height:20px;accent-color:var(--success);cursor:pointer;"
+                   ${worked ? "checked" : ""} 
+                   onchange="toggleAttendance('${w.id}', '${d}', this.checked)">
+          </td>
+        `;
+      }).join('')}
+      <td>
+        <div class="actions">
+          <button class="btn btn-outline" onclick="editWorker('${w.id}')">Sửa</button>
+          <button class="btn btn-danger" onclick="deleteWorker('${w.id}')">Xóa</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+  
+  setTimeout(() => {
+    const wrap = document.querySelector('.table-wrap');
+    if(wrap) wrap.scrollLeft = wrap.scrollWidth;
+  }, 10);
+}
+
+function renderSalary() {
+  const tbody = document.getElementById("salaryTable");
+  const wage = parseInt(document.getElementById("dailyWage").value) || 0;
+  
+  if(!workers.length){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">Chưa có thợ nào trong danh sách.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = workers.map((w, i) => {
+    const totalDays = w.attendance ? Object.values(w.attendance).filter(val => val === true).length : 0;
+    const totalMoney = totalDays * wage;
+    
+    return `<tr>
+      <td>${i+1}</td>
+      <td><div class="worker-name">${escapeHtml(w.name)}</div></td>
+      <td><span class="phone">${escapeHtml(w.phone)}</span></td>
+      <td style="text-align:center;"><span class="badge green" style="font-size:14px;">${totalDays} công</span></td>
+      <td style="text-align:right; font-weight:800; color:var(--danger); font-size:16px;">${formatMoney(totalMoney)}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline" style="border-color:var(--success); color:var(--success);" onclick="printInvoice('${w.id}', ${totalDays}, ${wage}, ${totalMoney})">🖨️ In Hóa Đơn</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function printInvoice(id, days, rate, total) {
+  const w = workers.find(x => x.id === id);
+  if(!w) return;
+  
+  const today = new Date();
+  document.getElementById("invDate").textContent = `${pad(today.getDate())}/${pad(today.getMonth()+1)}/${today.getFullYear()}`;
+  document.getElementById("invName").textContent = w.name;
+  document.getElementById("invSignName").textContent = w.name;
+  document.getElementById("invPhone").textContent = w.phone;
+  
+  document.getElementById("invDays").textContent = days;
+  document.getElementById("invRate").textContent = formatMoney(rate);
+  document.getElementById("invTotalRow").textContent = formatMoney(total);
+  document.getElementById("invTotal").textContent = formatMoney(total);
+  
+  window.print();
+}
+
+function toggleAttendance(id, dateKey, checked){
+  const w=workers.find(x=>x.id===id);
+  if(!w)return;
+  if(!w.attendance)w.attendance={};
+  w.attendance[dateKey]=checked;
+  save(); 
+  toast(checked ? `Đã ghi nhận đi làm.` : `Đã hủy chấm công.`);
+  if(document.getElementById("salary").classList.contains("active")) {
+      renderSalary();
+  }
+}
+
+document.getElementById("addForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const worker={
+    id:crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    name:document.getElementById("name").value.trim(),
+    phone:document.getElementById("phone").value.trim(),
+    startDate:document.getElementById("startDate").value,
+    attendance:{}
+  };
+  if(!worker.name||!worker.phone||!worker.startDate)return;
+  workers.push(worker); save();
+  e.target.reset();
+  toast("Đã thêm thợ thành công.");
+  goPage("manage");
+});
+
+function editWorker(id){
+  const w=workers.find(x=>x.id===id); if(!w)return;
+  editingId=id;
+  document.getElementById("editName").value=w.name;
+  document.getElementById("editPhone").value=w.phone;
+  document.getElementById("editStart").value=w.startDate;
+  document.getElementById("editModal").classList.add("show");
+}
+function closeEdit(){
+  editingId=null;document.getElementById("editModal").classList.remove("show");
+}
+function saveEdit(){
+  const w=workers.find(x=>x.id===editingId); if(!w)return;
+  w.name=document.getElementById("editName").value.trim();
+  w.phone=document.getElementById("editPhone").value.trim();
+  w.startDate=document.getElementById("editStart").value;
+  if(!w.name||!w.phone||!w.startDate){toast("Vui lòng nhập đầy đủ thông tin.");return}
+  save();
+  closeEdit();renderWorkers();toast("Đã cập nhật thông tin.");
+}
+function deleteWorker(id){
+  const w=workers.find(x=>x.id===id); if(!w)return;
+  if(!confirm(`Bạn có chắc muốn xóa thợ "${w.name}"?`))return;
+  workers=workers.filter(x=>x.id!==id);
+  save();
+  renderWorkers();
+  if(document.getElementById("salary").classList.contains("active")) renderSalary();
+  toast("Đã xóa thợ.");
+}
+document.getElementById("search").addEventListener("input",renderWorkers);
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+document.getElementById("startDate").value=todayKey();
+renderHome();
+renderWorkers();
+
+let lastDate=todayKey();
+setInterval(()=>{
+  const now=todayKey();
+  if(now!==lastDate){
+      lastDate=now;
+      renderHome();
+      if(document.getElementById("manage").classList.contains("active")) renderWorkers();
+      toast("Đã chuyển sang ngày mới.");
+  }
+},30000);
+</script>
+</body>
+</html>
